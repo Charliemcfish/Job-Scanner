@@ -4,6 +4,10 @@ const statusText = document.getElementById('status');
 const audioUpload = document.getElementById('audioUpload');
 const currentAudioName = document.getElementById('currentAudioName');
 const resetAudio = document.getElementById('resetAudio');
+const copyPromptBtn = document.getElementById('copyPrompt');
+const copyJobDetailsBtn = document.getElementById('copyJobDetails');
+const promptFeedback = document.getElementById('promptFeedback');
+const jobFeedback = document.getElementById('jobFeedback');
 
 // Load saved state when popup opens
 chrome.storage.local.get(['enabled', 'customAudio', 'customAudioName'], function(result) {
@@ -83,3 +87,72 @@ function updateStatus(isEnabled) {
     statusText.classList.remove('active');
   }
 }
+
+// Handle copy prompt button
+copyPromptBtn.addEventListener('click', async function() {
+  try {
+    // Fetch the Proposal Prompt.txt file
+    const response = await fetch(chrome.runtime.getURL('Proposal Prompt.txt'));
+    const text = await response.text();
+
+    // Copy to clipboard
+    await navigator.clipboard.writeText(text);
+
+    // Show feedback
+    promptFeedback.textContent = '✓ Copied to clipboard!';
+    setTimeout(() => {
+      promptFeedback.textContent = '';
+    }, 2000);
+  } catch (error) {
+    promptFeedback.textContent = '✗ Failed to copy';
+    console.error('Error copying prompt:', error);
+    setTimeout(() => {
+      promptFeedback.textContent = '';
+    }, 2000);
+  }
+});
+
+// Handle copy job details button
+copyJobDetailsBtn.addEventListener('click', function() {
+  // Query the active tab
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    if (tabs[0] && tabs[0].url && tabs[0].url.includes('upwork.com')) {
+      // Send message to content script to get job details
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'getJobDetails' }, function(response) {
+        if (chrome.runtime.lastError) {
+          jobFeedback.textContent = '✗ Not on a job page';
+          setTimeout(() => {
+            jobFeedback.textContent = '';
+          }, 2000);
+          return;
+        }
+
+        if (response && response.success) {
+          // Copy job details to clipboard
+          navigator.clipboard.writeText(response.jobDetails).then(() => {
+            jobFeedback.textContent = '✓ Job details copied!';
+            setTimeout(() => {
+              jobFeedback.textContent = '';
+            }, 2000);
+          }).catch(error => {
+            jobFeedback.textContent = '✗ Failed to copy';
+            console.error('Error copying job details:', error);
+            setTimeout(() => {
+              jobFeedback.textContent = '';
+            }, 2000);
+          });
+        } else {
+          jobFeedback.textContent = '✗ No job details found';
+          setTimeout(() => {
+            jobFeedback.textContent = '';
+          }, 2000);
+        }
+      });
+    } else {
+      jobFeedback.textContent = '✗ Not on Upwork';
+      setTimeout(() => {
+        jobFeedback.textContent = '';
+      }, 2000);
+    }
+  });
+});

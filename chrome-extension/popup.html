@@ -146,10 +146,91 @@
     .reset-audio:hover {
       color: #004999;
     }
+
+    .proposal-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .copy-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #14a800;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .copy-button:hover {
+      background-color: #108800;
+    }
+
+    .copy-button:active {
+      background-color: #0d7000;
+    }
+
+    .copy-button.secondary {
+      background-color: #6fda44;
+    }
+
+    .copy-button.secondary:hover {
+      background-color: #5bc62d;
+    }
+
+    .copy-button.secondary:active {
+      background-color: #4ab31f;
+    }
+
+    .copy-feedback {
+      font-size: 11px;
+      color: #14a800;
+      text-align: center;
+      margin-top: -5px;
+      margin-bottom: 10px;
+      min-height: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #14a800;
+    }
+
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0;
+      color: #14a800;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
-  <h1>Upwork Job Scanner</h1>
+  <div class="header">
+    <img src="icons/icon48.png" alt="Upwork" class="header-icon">
+    <h1>Upwork Job Scanner</h1>
+  </div>
 
   <div class="setting">
     <div class="setting-header">
@@ -172,6 +253,14 @@
       <span id="currentAudioName">Default (alert-sound.wav)</span>
       <span class="reset-audio" id="resetAudio" style="display: none;">Reset to Default</span>
     </div>
+  </div>
+
+  <div class="proposal-section">
+    <div class="section-title">Proposal Tools</div>
+    <button class="copy-button" id="copyPrompt">📋 Copy Prompt</button>
+    <div class="copy-feedback" id="promptFeedback"></div>
+    <button class="copy-button secondary" id="copyJobDetails">📄 Copy Job Details</button>
+    <div class="copy-feedback" id="jobFeedback"></div>
   </div>
 
   <script src="popup.js"></script>

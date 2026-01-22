@@ -73,6 +73,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else {
       stopScanning();
     }
+  } else if (request.action === 'getJobDetails') {
+    // Extract job details from the current page
+    const jobDetails = extractJobDetails();
+    sendResponse(jobDetails);
+    return true; // Keep channel open for async response
   }
 });
 
@@ -242,4 +247,124 @@ function showClickPrompt() {
 
   prompt.addEventListener('click', removePrompt);
   setTimeout(removePrompt, 10000);
+}
+
+// Extract job details from the current page
+function extractJobDetails() {
+  try {
+    let jobTitle = '';
+    let budget = '';
+    let description = '';
+
+    // Try to extract from job details page (when viewing a specific job)
+    const titleElement = document.querySelector('h4[class*="job-title"]') ||
+                        document.querySelector('[data-test="job-title"]') ||
+                        document.querySelector('h2.h4') ||
+                        document.querySelector('.air3-card-section h4');
+
+    if (titleElement) {
+      jobTitle = titleElement.textContent.trim();
+    }
+
+    // Try multiple selectors for budget
+    const budgetElement = document.querySelector('[data-test="budget"]') ||
+                         document.querySelector('[data-test="job-type-label"]') ||
+                         document.querySelector('[class*="budget"]') ||
+                         Array.from(document.querySelectorAll('strong, [class*="text-body-sm"]')).find(el =>
+                           el.textContent.includes('$') ||
+                           el.textContent.includes('Hourly') ||
+                           el.textContent.includes('Fixed')
+                         );
+
+    if (budgetElement) {
+      budget = budgetElement.textContent.trim();
+    } else {
+      // Try to find budget in the sidebar or anywhere with $ symbol
+      const allText = Array.from(document.querySelectorAll('[class*="sidebar"] *, [class*="job-detail"] *'));
+      const budgetText = allText.find(el => {
+        const text = el.textContent;
+        return (text.includes('$') || text.includes('Hourly') || text.includes('Fixed')) &&
+               text.length < 100 &&
+               !text.includes('Spent') &&
+               !text.includes('spent');
+      });
+      if (budgetText) {
+        budget = budgetText.textContent.trim();
+      }
+    }
+
+    // Try to extract description
+    const descriptionElement = document.querySelector('[data-test="job-description"]') ||
+                              document.querySelector('[class*="description"]') ||
+                              document.querySelector('.air3-card-section[class*="break"] p') ||
+                              document.querySelector('[class*="text-body"]');
+
+    if (descriptionElement) {
+      // Get the full description text, handling multiple paragraphs
+      const descContainer = descriptionElement.closest('[class*="card-section"]') ||
+                           descriptionElement.closest('[class*="description"]') ||
+                           descriptionElement.parentElement;
+
+      if (descContainer) {
+        description = descContainer.textContent.trim();
+      } else {
+        description = descriptionElement.textContent.trim();
+      }
+    }
+
+    // If we couldn't find detailed job info, try to get from job tile (for job list page)
+    if (!jobTitle && !description) {
+      // Try to find selected/clicked job tile
+      const selectedJob = document.querySelector('section[data-ev-opening_uid].air3-token-highlight-background') ||
+                         document.querySelector('section[data-ev-opening_uid]');
+
+      if (selectedJob) {
+        const titleInTile = selectedJob.querySelector('h4, h3, h2');
+        if (titleInTile) {
+          jobTitle = titleInTile.textContent.trim();
+        }
+
+        const descInTile = selectedJob.querySelector('[data-test="job-description-text"]') ||
+                          selectedJob.querySelector('p[class*="text"]');
+        if (descInTile) {
+          description = descInTile.textContent.trim();
+        }
+
+        const budgetInTile = Array.from(selectedJob.querySelectorAll('strong, span')).find(el =>
+          el.textContent.includes('$') ||
+          el.textContent.includes('Hourly') ||
+          el.textContent.includes('Fixed')
+        );
+        if (budgetInTile) {
+          budget = budgetInTile.textContent.trim();
+        }
+      }
+    }
+
+    // Format the output
+    if (jobTitle || description) {
+      const formattedDetails = `Job Title: ${jobTitle || 'Not found'}
+
+Budget: ${budget || 'Not found'}
+
+Job Description:
+${description || 'Not found'}`;
+
+      return {
+        success: true,
+        jobDetails: formattedDetails
+      };
+    } else {
+      return {
+        success: false,
+        jobDetails: ''
+      };
+    }
+  } catch (error) {
+    console.error('Error extracting job details:', error);
+    return {
+      success: false,
+      jobDetails: ''
+    };
+  }
 }
