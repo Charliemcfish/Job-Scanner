@@ -8,7 +8,7 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://www.upwork.com/nx/find-work/*"
+    "https://www.upwork.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -25,7 +25,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.upwork.com/nx/find-work/*"],
+      "matches": ["https://www.upwork.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
