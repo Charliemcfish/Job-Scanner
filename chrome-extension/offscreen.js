@@ -9,24 +9,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 async function playAudio(count) {
-  console.log('Offscreen: Playing audio for', count, 'new job(s)');
+  console.log('Offscreen: Playing audio notification');
 
   try {
     // Get custom audio or use default
     const result = await chrome.storage.local.get(['customAudio']);
     const audioSrc = result.customAudio || chrome.runtime.getURL('alert-sound.wav');
 
-    // Play sound for each new job with a delay between plays
-    for (let i = 0; i < count; i++) {
-      setTimeout(() => {
-        const audio = new Audio(audioSrc);
-        audio.volume = 1.0;
+    // Play sound once
+    const audio = new Audio(audioSrc);
+    audio.volume = 1.0;
 
-        audio.play()
-          .then(() => console.log('Offscreen: Audio played successfully'))
-          .catch(error => console.error('Offscreen: Audio play failed:', error));
-      }, i * 1000);
-    }
+    audio.play()
+      .then(() => console.log('Offscreen: Audio played successfully'))
+      .catch(error => console.error('Offscreen: Audio play failed:', error));
   } catch (error) {
     console.error('Offscreen: Error playing audio:', error);
   }

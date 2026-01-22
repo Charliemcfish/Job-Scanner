@@ -5,7 +5,7 @@ let previousJobIds = new Set();
 let audioContext = null;
 let audioPrimed = false;
 let audioUnlocked = false;
-let pendingAudioNotifications = 0;
+let initialLoadComplete = false;
 
 // Initialize on page load
 init();
@@ -46,10 +46,12 @@ function init() {
         });
       }
     }, 5000); // Try every 5 seconds
-  });
 
-  // Scan jobs on initial load
-  scanJobs();
+    // IMPORTANT: Only scan jobs AFTER we've loaded previousJobIds from storage
+    // This prevents false positives on page load
+    initialLoadComplete = true;
+    scanJobs();
+  });
 }
 
 // Initialize audio context and attempt to resume it
@@ -64,11 +66,6 @@ function initializeAudio() {
     audioContext.resume().then(function() {
       console.log('Audio context resumed successfully');
       audioUnlocked = true;
-      // If there are pending notifications, play them now
-      if (pendingAudioNotifications > 0) {
-        playNotificationSounds(pendingAudioNotifications);
-        pendingAudioNotifications = 0;
-      }
     }).catch(function(error) {
       console.log('Audio context resume failed:', error);
     });
@@ -112,12 +109,6 @@ function unlockAudio() {
       const prompt = document.getElementById('upwork-scanner-prompt');
       if (prompt) {
         prompt.remove();
-      }
-
-      // Play any pending notifications
-      if (pendingAudioNotifications > 0) {
-        playNotificationSounds(pendingAudioNotifications);
-        pendingAudioNotifications = 0;
       }
     }).catch(function(error) {
       console.log('Audio unlock failed:', error);
@@ -225,86 +216,29 @@ function scanJobs() {
   });
 }
 
-// Play notification sound for each new job
+// Play notification sound - simplified to play once
 function playNotificationSounds(count) {
-  console.log('Attempting to play notification sounds for', count, 'new job(s)');
+  console.log('New job(s) detected:', count);
 
-  // Show visual notification immediately regardless of audio state
+  // Show visual notification immediately
   showNewJobAlert(count);
 
-  // Method 1: Try background service worker first (most reliable, no user gesture needed)
+  // Play audio notification once via background service worker
+  // This handles both TTS and audio playback
   try {
     chrome.runtime.sendMessage({
       action: 'playAudioNotification',
-      count: count
+      count: 1  // Always play notification once, regardless of job count
     }, function(response) {
       if (chrome.runtime.lastError) {
-        console.log('Background audio failed, trying fallback methods:', chrome.runtime.lastError);
-        tryFallbackAudio(count);
+        console.log('Background audio notification failed:', chrome.runtime.lastError);
       } else {
-        console.log('Background audio triggered successfully');
-        // Still try fallback methods as backup
-        tryFallbackAudio(count);
+        console.log('Audio notification triggered successfully');
       }
     });
   } catch (error) {
     console.error('Error sending message to background:', error);
-    tryFallbackAudio(count);
   }
-}
-
-// Fallback audio methods (content script)
-function tryFallbackAudio(count) {
-  // Try to resume audio context if suspended
-  if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume().then(function() {
-      audioUnlocked = true;
-      attemptPlayAudio(count);
-    }).catch(function(error) {
-      console.error('Failed to resume audio context:', error);
-      storePendingNotification(count);
-    });
-  } else if (audioContext && audioContext.state === 'running') {
-    audioUnlocked = true;
-    attemptPlayAudio(count);
-  } else {
-    // Audio context not initialized or not unlocked
-    storePendingNotification(count);
-  }
-}
-
-// Store pending notification and show prompt
-function storePendingNotification(count) {
-  pendingAudioNotifications += count;
-  console.log('Audio not ready - stored', count, 'pending notifications');
-  showClickPrompt();
-}
-
-// Attempt to play audio
-function attemptPlayAudio(count) {
-  chrome.storage.local.get(['customAudio'], function(result) {
-    const audioSrc = result.customAudio || chrome.runtime.getURL('alert-sound.wav');
-
-    // Play sound for each new job with a slight delay between plays
-    let successfulPlays = 0;
-    for (let i = 0; i < count; i++) {
-      setTimeout(function() {
-        const audio = new Audio(audioSrc);
-        audio.volume = 1.0; // Full volume for actual notifications
-
-        audio.play().then(function() {
-          successfulPlays++;
-          console.log('Audio played successfully');
-        }).catch(function(error) {
-          console.error('Error playing audio:', error);
-          // Store as pending if first play fails
-          if (successfulPlays === 0 && i === 0) {
-            storePendingNotification(count - i);
-          }
-        });
-      }, i * 1000); // 1 second delay between each sound
-    }
-  });
 }
 
 // Show prominent visual alert for new jobs
