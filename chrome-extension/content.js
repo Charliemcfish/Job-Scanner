@@ -25,10 +25,27 @@ function init() {
     initializeAudio();
 
     // Add multiple event listeners to catch user interaction
-    const interactionEvents = ['click', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    // Using more events and not using 'once' so we keep trying
+    const interactionEvents = ['click', 'mousedown', 'keydown', 'touchstart', 'scroll', 'mousemove', 'wheel', 'pointerdown'];
     interactionEvents.forEach(function(eventType) {
-      document.addEventListener(eventType, unlockAudio, { once: true, passive: true });
+      document.addEventListener(eventType, unlockAudio, { passive: true, capture: true });
     });
+
+    // Also try to unlock audio immediately on visibility change
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        initializeAudio();
+      }
+    });
+
+    // Set up a recurring timer to keep trying to resume audio context
+    setInterval(function() {
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume().catch(function() {
+          // Silent fail, will keep trying
+        });
+      }
+    }, 5000); // Try every 5 seconds
   });
 
   // Scan jobs on initial load
@@ -63,7 +80,10 @@ function initializeAudio() {
 
 // Unlock audio with user interaction
 function unlockAudio() {
-  if (audioUnlocked) return;
+  // Don't return early - always try to resume if suspended
+  if (audioUnlocked && audioContext && audioContext.state === 'running') {
+    return; // Already unlocked and running
+  }
 
   console.log('User interaction detected - unlocking audio');
 
@@ -212,6 +232,29 @@ function playNotificationSounds(count) {
   // Show visual notification immediately regardless of audio state
   showNewJobAlert(count);
 
+  // Method 1: Try background service worker first (most reliable, no user gesture needed)
+  try {
+    chrome.runtime.sendMessage({
+      action: 'playAudioNotification',
+      count: count
+    }, function(response) {
+      if (chrome.runtime.lastError) {
+        console.log('Background audio failed, trying fallback methods:', chrome.runtime.lastError);
+        tryFallbackAudio(count);
+      } else {
+        console.log('Background audio triggered successfully');
+        // Still try fallback methods as backup
+        tryFallbackAudio(count);
+      }
+    });
+  } catch (error) {
+    console.error('Error sending message to background:', error);
+    tryFallbackAudio(count);
+  }
+}
+
+// Fallback audio methods (content script)
+function tryFallbackAudio(count) {
   // Try to resume audio context if suspended
   if (audioContext && audioContext.state === 'suspended') {
     audioContext.resume().then(function() {
@@ -454,7 +497,41 @@ function extractJobDetails() {
                            descriptionElement.parentElement;
 
       if (descContainer) {
-        description = descContainer.textContent.trim();
+        // Clone the container to manipulate it without affecting the page
+        const clone = descContainer.cloneNode(true);
+
+        // Remove unwanted UI elements
+        // Remove "Just not interested" feedback section
+        const feedbackSections = clone.querySelectorAll('[class*="dropdown"], [class*="feedback"], [role="group"], button, [class*="save"]');
+        feedbackSections.forEach(el => el.remove());
+
+        // Remove country/proposals section at the bottom
+        const allDivs = Array.from(clone.querySelectorAll('div, span, li'));
+        allDivs.forEach(el => {
+          const text = el.textContent.trim();
+          // Remove elements containing proposal counts or country info
+          if (text.match(/Proposals:\s*(Less than|More than|\d+)/i) ||
+              text.match(/^\s*(Just not interested|Vague Description|Unrealistic Expectations|Too Many Applicants|Job posted too long ago|Poor reviews|Doesn't Match Skills|overqualified|Budget too low|Not in my preferred location)\s*$/i) ||
+              text.includes('client will not be notified') ||
+              text.includes('feedback helps us improve') ||
+              text.match(/^(Save job|Saved)$/i)) {
+            el.remove();
+          }
+        });
+
+        // Get text content and clean it up
+        description = clone.textContent
+          .trim()
+          // Remove excessive whitespace
+          .replace(/\s+/g, ' ')
+          // Remove remaining UI artifacts
+          .replace(/Just not interested.*?improve job search\./gi, '')
+          .replace(/The client will not be notified.*?improve job search\./gi, '')
+          .replace(/Save job/gi, '')
+          .replace(/Proposals:\s*(Less than|More than)?\s*\d+/gi, '')
+          // Clean up country names at the end (common pattern: country name followed by proposals)
+          .replace(/\s+(Afghanistan|Albania|Algeria|Andorra|Angola|Argentina|Armenia|Australia|Austria|Azerbaijan|Bahrain|Bangladesh|Belarus|Belgium|Belize|Benin|Bhutan|Bolivia|Bosnia|Botswana|Brazil|Brunei|Bulgaria|Burkina|Burundi|Cambodia|Cameroon|Canada|Chad|Chile|China|Colombia|Congo|Costa Rica|Croatia|Cuba|Cyprus|Czech|Denmark|Djibouti|Dominica|Ecuador|Egypt|El Salvador|England|Eritrea|Estonia|Ethiopia|Fiji|Finland|France|Gabon|Gambia|Georgia|Germany|Ghana|Greece|Grenada|Guatemala|Guinea|Guyana|Haiti|Honduras|Hungary|Iceland|India|Indonesia|Iran|Iraq|Ireland|Israel|Italy|Jamaica|Japan|Jordan|Kazakhstan|Kenya|Kuwait|Kyrgyzstan|Laos|Latvia|Lebanon|Lesotho|Liberia|Libya|Liechtenstein|Lithuania|Luxembourg|Macedonia|Madagascar|Malawi|Malaysia|Maldives|Mali|Malta|Mauritania|Mauritius|Mexico|Micronesia|Moldova|Monaco|Mongolia|Montenegro|Morocco|Mozambique|Myanmar|Namibia|Nauru|Nepal|Netherlands|New Zealand|Nicaragua|Niger|Nigeria|Norway|Oman|Pakistan|Palau|Palestine|Panama|Papua|Paraguay|Peru|Philippines|Poland|Portugal|Qatar|Romania|Russia|Rwanda|Samoa|San Marino|Saudi Arabia|Senegal|Serbia|Seychelles|Sierra Leone|Singapore|Slovakia|Slovenia|Somalia|South Africa|South Korea|South Sudan|Spain|Sri Lanka|Sudan|Suriname|Swaziland|Sweden|Switzerland|Syria|Taiwan|Tajikistan|Tanzania|Thailand|Togo|Tonga|Trinidad|Tunisia|Turkey|Turkmenistan|Tuvalu|Uganda|Ukraine|United Arab Emirates|United Kingdom|United States|Uruguay|Uzbekistan|Vanuatu|Vatican|Venezuela|Vietnam|Yemen|Zambia|Zimbabwe)\s*$/gi, '')
+          .trim();
       } else {
         description = descriptionElement.textContent.trim();
       }
