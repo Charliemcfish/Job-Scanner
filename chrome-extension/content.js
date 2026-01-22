@@ -10,20 +10,25 @@ init();
 
 function init() {
   // Load initial state from storage
-  chrome.storage.local.get(['enabled', 'previousJobs'], function(result) {
+  chrome.storage.local.get(['enabled', 'previousJobs', 'audioPrimed'], function(result) {
     isEnabled = result.enabled || false;
     previousJobIds = new Set(result.previousJobs || []);
+    audioPrimed = result.audioPrimed || false;
 
     if (isEnabled) {
       startScanning();
+    }
+
+    // If audio not primed yet, add click listener
+    if (!audioPrimed) {
+      document.addEventListener('click', primeAudio, { once: true });
+    } else {
+      console.log('Audio already primed from previous session');
     }
   });
 
   // Scan jobs on initial load
   scanJobs();
-
-  // Add click listener to prime audio on first user interaction
-  document.addEventListener('click', primeAudio, { once: true });
 }
 
 // Prime audio for autoplay
@@ -47,6 +52,8 @@ function primeAudio() {
     audio.volume = 0.01; // Almost silent
     audio.play().then(function() {
       audioPrimed = true;
+      // Save primed state so it persists across page refreshes
+      chrome.storage.local.set({ audioPrimed: true });
       console.log('Audio primed and ready');
     }).catch(function(error) {
       console.log('Audio priming failed:', error);
