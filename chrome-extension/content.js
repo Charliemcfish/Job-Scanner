@@ -379,135 +379,84 @@ function extractJobDetails() {
     let budget = '';
     let description = '';
 
-    // Try to extract from job details page (when viewing a specific job)
-    const titleElement = document.querySelector('h4[class*="job-title"]') ||
-                        document.querySelector('[data-test="job-title"]') ||
-                        document.querySelector('h2.h4') ||
-                        document.querySelector('.air3-card-section h4') ||
-                        document.querySelector('a.air3-link[data-ev-label="link"]') ||
-                        document.querySelector('a[href*="/jobs/"]');
+    // First, try to find the latest/first job in the job list (most recent job)
+    const jobContainer = document.querySelector('[data-test="job-tile-list"]');
 
-    if (titleElement) {
-      jobTitle = titleElement.textContent.trim();
-    }
+    if (jobContainer) {
+      // Find the first job section (latest/most recent job)
+      const firstJobSection = jobContainer.querySelector('section[data-ev-opening_uid]');
 
-    // Try multiple selectors for budget
-    const budgetElement = document.querySelector('[data-test="budget"]') ||
-                         document.querySelector('[data-test="job-type-label"]') ||
-                         document.querySelector('[class*="budget"]') ||
-                         Array.from(document.querySelectorAll('strong, [class*="text-body-sm"]')).find(el =>
-                           el.textContent.includes('$') ||
-                           el.textContent.includes('Hourly') ||
-                           el.textContent.includes('Fixed')
-                         );
+      if (firstJobSection) {
+        // Extract title from the first job
+        const titleElement = firstJobSection.querySelector('h3.job-tile-title a') ||
+                           firstJobSection.querySelector('.job-tile-title a') ||
+                           firstJobSection.querySelector('h3 a') ||
+                           firstJobSection.querySelector('a[data-ev-label="link"]');
 
-    if (budgetElement) {
-      budget = budgetElement.textContent.trim();
-    } else {
-      // Try to find budget in the sidebar or anywhere with $ symbol
-      const allText = Array.from(document.querySelectorAll('[class*="sidebar"] *, [class*="job-detail"] *'));
-      const budgetText = allText.find(el => {
-        const text = el.textContent;
-        return (text.includes('$') || text.includes('Hourly') || text.includes('Fixed')) &&
-               text.length < 100 &&
-               !text.includes('Spent') &&
-               !text.includes('spent');
-      });
-      if (budgetText) {
-        budget = budgetText.textContent.trim();
+        if (titleElement) {
+          jobTitle = titleElement.textContent.trim();
+        }
+
+        // Extract budget from the first job
+        const budgetElement = firstJobSection.querySelector('[data-test="budget"]');
+        if (budgetElement) {
+          budget = budgetElement.textContent.trim();
+        } else {
+          // Try to find job type and budget together
+          const jobTypeElement = firstJobSection.querySelector('[data-test="job-type"]');
+          if (jobTypeElement) {
+            // Get the whole line that contains job type and budget
+            const parent = jobTypeElement.closest('small');
+            if (parent) {
+              budget = parent.textContent.trim();
+            } else {
+              budget = jobTypeElement.textContent.trim();
+            }
+          }
+        }
+
+        // Extract description from the first job
+        const descElement = firstJobSection.querySelector('[data-test="job-description-text"]');
+        if (descElement) {
+          description = descElement.textContent.trim();
+        }
       }
     }
 
-    // Try to extract description
-    const descriptionElement = document.querySelector('[data-test="job-description"]') ||
-                              document.querySelector('[class*="description"]') ||
-                              document.querySelector('.air3-card-section[class*="break"] p') ||
-                              document.querySelector('[class*="text-body"]');
+    // If we didn't find job in the list, try to extract from job details page (when viewing a specific job)
+    if (!jobTitle && !description) {
+      const titleElement = document.querySelector('h4[class*="job-title"]') ||
+                          document.querySelector('[data-test="job-title"]') ||
+                          document.querySelector('h2.h4') ||
+                          document.querySelector('.air3-card-section h4');
 
-    if (descriptionElement) {
-      // Get the full description text, handling multiple paragraphs
-      const descContainer = descriptionElement.closest('[class*="card-section"]') ||
-                           descriptionElement.closest('[class*="description"]') ||
-                           descriptionElement.parentElement;
+      if (titleElement) {
+        jobTitle = titleElement.textContent.trim();
+      }
 
-      if (descContainer) {
-        // Clone the container to manipulate it without affecting the page
-        const clone = descContainer.cloneNode(true);
+      // Try to find budget on detail page
+      const budgetElement = document.querySelector('[data-test="budget"]') ||
+                           document.querySelector('[data-test="job-type-label"]');
 
-        // Remove unwanted UI elements
-        // Remove "Just not interested" feedback section
-        const feedbackSections = clone.querySelectorAll('[class*="dropdown"], [class*="feedback"], [role="group"], button, [class*="save"]');
-        feedbackSections.forEach(el => el.remove());
+      if (budgetElement) {
+        budget = budgetElement.textContent.trim();
+      }
 
-        // Remove country/proposals section at the bottom
-        const allDivs = Array.from(clone.querySelectorAll('div, span, li'));
-        allDivs.forEach(el => {
-          const text = el.textContent.trim();
-          // Remove elements containing proposal counts or country info
-          if (text.match(/Proposals:\s*(Less than|More than|\d+)/i) ||
-              text.match(/^\s*(Just not interested|Vague Description|Unrealistic Expectations|Too Many Applicants|Job posted too long ago|Poor reviews|Doesn't Match Skills|overqualified|Budget too low|Not in my preferred location)\s*$/i) ||
-              text.includes('client will not be notified') ||
-              text.includes('feedback helps us improve') ||
-              text.match(/^(Save job|Saved)$/i)) {
-            el.remove();
-          }
-        });
+      // Try to extract description from detail page
+      const descriptionElement = document.querySelector('[data-test="job-description"]');
 
-        // Get text content and clean it up
-        description = clone.textContent
-          .trim()
-          // Remove excessive whitespace
-          .replace(/\s+/g, ' ')
-          // Remove remaining UI artifacts
-          .replace(/Just not interested.*?improve job search\./gi, '')
-          .replace(/The client will not be notified.*?improve job search\./gi, '')
-          .replace(/Save job/gi, '')
-          .replace(/Proposals:\s*(Less than|More than)?\s*\d+/gi, '')
-          // Clean up country names at the end (common pattern: country name followed by proposals)
-          .replace(/\s+(Afghanistan|Albania|Algeria|Andorra|Angola|Argentina|Armenia|Australia|Austria|Azerbaijan|Bahrain|Bangladesh|Belarus|Belgium|Belize|Benin|Bhutan|Bolivia|Bosnia|Botswana|Brazil|Brunei|Bulgaria|Burkina|Burundi|Cambodia|Cameroon|Canada|Chad|Chile|China|Colombia|Congo|Costa Rica|Croatia|Cuba|Cyprus|Czech|Denmark|Djibouti|Dominica|Ecuador|Egypt|El Salvador|England|Eritrea|Estonia|Ethiopia|Fiji|Finland|France|Gabon|Gambia|Georgia|Germany|Ghana|Greece|Grenada|Guatemala|Guinea|Guyana|Haiti|Honduras|Hungary|Iceland|India|Indonesia|Iran|Iraq|Ireland|Israel|Italy|Jamaica|Japan|Jordan|Kazakhstan|Kenya|Kuwait|Kyrgyzstan|Laos|Latvia|Lebanon|Lesotho|Liberia|Libya|Liechtenstein|Lithuania|Luxembourg|Macedonia|Madagascar|Malawi|Malaysia|Maldives|Mali|Malta|Mauritania|Mauritius|Mexico|Micronesia|Moldova|Monaco|Mongolia|Montenegro|Morocco|Mozambique|Myanmar|Namibia|Nauru|Nepal|Netherlands|New Zealand|Nicaragua|Niger|Nigeria|Norway|Oman|Pakistan|Palau|Palestine|Panama|Papua|Paraguay|Peru|Philippines|Poland|Portugal|Qatar|Romania|Russia|Rwanda|Samoa|San Marino|Saudi Arabia|Senegal|Serbia|Seychelles|Sierra Leone|Singapore|Slovakia|Slovenia|Somalia|South Africa|South Korea|South Sudan|Spain|Sri Lanka|Sudan|Suriname|Swaziland|Sweden|Switzerland|Syria|Taiwan|Tajikistan|Tanzania|Thailand|Togo|Tonga|Trinidad|Tunisia|Turkey|Turkmenistan|Tuvalu|Uganda|Ukraine|United Arab Emirates|United Kingdom|United States|Uruguay|Uzbekistan|Vanuatu|Vatican|Venezuela|Vietnam|Yemen|Zambia|Zimbabwe)\s*$/gi, '')
-          .trim();
-      } else {
+      if (descriptionElement) {
         description = descriptionElement.textContent.trim();
       }
     }
 
-    // If we couldn't find detailed job info, try to get from job tile (for job list page)
-    if (!jobTitle && !description) {
-      // Try to find selected/clicked job tile
-      const selectedJob = document.querySelector('section[data-ev-opening_uid].air3-token-highlight-background') ||
-                         document.querySelector('section[data-ev-opening_uid]');
-
-      if (selectedJob) {
-        const titleInTile = selectedJob.querySelector('h4, h3, h2');
-        if (titleInTile) {
-          jobTitle = titleInTile.textContent.trim();
-        }
-
-        const descInTile = selectedJob.querySelector('[data-test="job-description-text"]') ||
-                          selectedJob.querySelector('p[class*="text"]');
-        if (descInTile) {
-          description = descInTile.textContent.trim();
-        }
-
-        const budgetInTile = Array.from(selectedJob.querySelectorAll('strong, span')).find(el =>
-          el.textContent.includes('$') ||
-          el.textContent.includes('Hourly') ||
-          el.textContent.includes('Fixed')
-        );
-        if (budgetInTile) {
-          budget = budgetInTile.textContent.trim();
-        }
-      }
-    }
-
-    // Format the output
+    // Format the output - only include title and description (budget is part of job type info)
     if (jobTitle || description) {
-      const formattedDetails = `Job Title: ${jobTitle || 'Not found'}
+      const formattedDetails = `${jobTitle}
 
-Budget: ${budget || 'Not found'}
+${description}
 
-Job Description:
-${description || 'Not found'}`;
+${budget}`;
 
       return {
         success: true,
