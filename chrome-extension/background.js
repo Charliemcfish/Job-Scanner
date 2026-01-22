@@ -9,30 +9,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// Play audio notification using multiple methods for maximum reliability
+// Play audio notification - simplified to play once
 async function playAudioNotification(count) {
-  console.log('Background: Playing notification for', count, 'new job(s)');
+  console.log('Background: Playing notification');
 
-  // Method 1: Try chrome.tts API first (doesn't require user gesture)
+  // Method 1: Play TTS (Text-to-Speech) notification
   try {
-    for (let i = 0; i < count; i++) {
-      setTimeout(() => {
-        chrome.tts.speak('New job alert!', {
-          rate: 1.5,
-          pitch: 1.2,
-          volume: 1.0
-        });
-      }, i * 1000);
-    }
+    chrome.tts.speak('New job alert!', {
+      rate: 1.5,
+      pitch: 1.2,
+      volume: 1.0
+    });
     console.log('Background: TTS notification played successfully');
   } catch (error) {
     console.error('Background: TTS notification failed:', error);
   }
 
-  // Method 2: Try to play audio file via offscreen document (for Manifest V3)
-  // This is more reliable than content script audio
+  // Method 2: Play audio file via offscreen document
   try {
-    await playAudioViaOffscreen(count);
+    await playAudioViaOffscreen(1);  // Always play once
   } catch (error) {
     console.error('Background: Offscreen audio failed:', error);
   }
