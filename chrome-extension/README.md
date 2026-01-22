@@ -82,6 +82,8 @@ The extension files are in the `chrome-extension` folder. Make sure you have:
 - Refresh the extensions page
 
 ### No sound playing
+- **First time?** You may need to click anywhere on the page after enabling the extension (Chrome's autoplay policy requires user interaction)
+- Look for a green notification in the top-right corner asking you to click
 - Check your browser's sound settings
 - Make sure the site is not muted (right-click the tab)
 - Try uploading a different audio file

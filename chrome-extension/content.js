@@ -2,6 +2,8 @@
 let isEnabled = false;
 let refreshTimer = null;
 let previousJobIds = new Set();
+let audioContext = null;
+let audioPrimed = false;
 
 // Initialize on page load
 init();
@@ -19,6 +21,37 @@ function init() {
 
   // Scan jobs on initial load
   scanJobs();
+
+  // Add click listener to prime audio on first user interaction
+  document.addEventListener('click', primeAudio, { once: true });
+}
+
+// Prime audio for autoplay
+function primeAudio() {
+  if (audioPrimed) return;
+
+  // Create audio context and unlock it
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  // Resume audio context (required for some browsers)
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+
+  // Create and play a silent audio to prime the system
+  chrome.storage.local.get(['customAudio'], function(result) {
+    const audioSrc = result.customAudio || chrome.runtime.getURL('alert-sound.wav');
+    const audio = new Audio(audioSrc);
+    audio.volume = 0.01; // Almost silent
+    audio.play().then(function() {
+      audioPrimed = true;
+      console.log('Audio primed and ready');
+    }).catch(function(error) {
+      console.log('Audio priming failed:', error);
+    });
+  });
 }
 
 // Listen for messages from popup
@@ -27,6 +60,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     isEnabled = request.enabled;
 
     if (isEnabled) {
+      // Prime audio when user enables (this is a user gesture)
+      primeAudio();
       startScanning();
     } else {
       stopScanning();
@@ -111,6 +146,18 @@ function scanJobs() {
 
 // Play notification sound for each new job
 function playNotificationSounds(count) {
+  // Ensure audio is primed
+  if (!audioPrimed) {
+    console.log('Audio not primed yet - click anywhere on the page to enable sounds');
+    showClickPrompt();
+    return;
+  }
+
+  // Resume audio context if suspended
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+
   // Load custom audio or use default
   chrome.storage.local.get(['customAudio'], function(result) {
     const audioSrc = result.customAudio || chrome.runtime.getURL('alert-sound.wav');
@@ -119,10 +166,73 @@ function playNotificationSounds(count) {
     for (let i = 0; i < count; i++) {
       setTimeout(function() {
         const audio = new Audio(audioSrc);
+        audio.volume = 1.0; // Full volume for actual notifications
+
         audio.play().catch(function(error) {
           console.error('Error playing audio:', error);
+          console.log('Try clicking anywhere on the page to enable sounds');
+          showClickPrompt();
         });
       }, i * 1000); // 1 second delay between each sound
     }
   });
+}
+
+// Show prompt to click on page
+function showClickPrompt() {
+  // Check if prompt already exists
+  if (document.getElementById('upwork-scanner-prompt')) return;
+
+  const prompt = document.createElement('div');
+  prompt.id = 'upwork-scanner-prompt';
+  prompt.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #14a800;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    animation: slideIn 0.3s ease-out;
+  `;
+  prompt.textContent = '🔔 Click anywhere to enable job notifications';
+
+  // Add animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  document.body.appendChild(prompt);
+
+  // Remove prompt when clicked or after 10 seconds
+  const removePrompt = function() {
+    if (prompt && prompt.parentNode) {
+      prompt.style.animation = 'slideIn 0.3s ease-out reverse';
+      setTimeout(function() {
+        if (prompt && prompt.parentNode) {
+          prompt.parentNode.removeChild(prompt);
+        }
+      }, 300);
+    }
+  };
+
+  prompt.addEventListener('click', removePrompt);
+  setTimeout(removePrompt, 10000);
 }
