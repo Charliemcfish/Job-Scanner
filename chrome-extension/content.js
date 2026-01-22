@@ -4,6 +4,8 @@ let refreshTimer = null;
 let previousJobIds = new Set();
 let audioContext = null;
 let audioPrimed = false;
+let audioUnlocked = false;
+let pendingAudioNotifications = 0;
 
 // Initialize on page load
 init();
@@ -19,46 +21,93 @@ function init() {
       startScanning();
     }
 
-    // If audio not primed yet, add click listener
-    if (!audioPrimed) {
-      document.addEventListener('click', primeAudio, { once: true });
-    } else {
-      console.log('Audio already primed from previous session');
-    }
+    // Aggressively prime audio on every page load
+    initializeAudio();
+
+    // Add multiple event listeners to catch user interaction
+    const interactionEvents = ['click', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    interactionEvents.forEach(function(eventType) {
+      document.addEventListener(eventType, unlockAudio, { once: true, passive: true });
+    });
   });
 
   // Scan jobs on initial load
   scanJobs();
 }
 
-// Prime audio for autoplay
-function primeAudio() {
-  if (audioPrimed) return;
-
-  // Create audio context and unlock it
+// Initialize audio context and attempt to resume it
+function initializeAudio() {
+  // Create audio context if it doesn't exist
   if (!audioContext) {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  // Resume audio context (required for some browsers)
+  // Try to resume audio context immediately (works if user previously interacted)
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().then(function() {
+      console.log('Audio context resumed successfully');
+      audioUnlocked = true;
+      // If there are pending notifications, play them now
+      if (pendingAudioNotifications > 0) {
+        playNotificationSounds(pendingAudioNotifications);
+        pendingAudioNotifications = 0;
+      }
+    }).catch(function(error) {
+      console.log('Audio context resume failed:', error);
+    });
+  } else if (audioContext.state === 'running') {
+    audioUnlocked = true;
+    console.log('Audio context already running');
+  }
+}
+
+// Unlock audio with user interaction
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  console.log('User interaction detected - unlocking audio');
+
+  // Create audio context if needed
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  // Resume audio context
   if (audioContext.state === 'suspended') {
     audioContext.resume();
   }
 
-  // Create and play a silent audio to prime the system
+  // Create and play a silent audio to unlock the audio system
   chrome.storage.local.get(['customAudio'], function(result) {
     const audioSrc = result.customAudio || chrome.runtime.getURL('alert-sound.wav');
     const audio = new Audio(audioSrc);
     audio.volume = 0.01; // Almost silent
     audio.play().then(function() {
+      audioUnlocked = true;
       audioPrimed = true;
-      // Save primed state so it persists across page refreshes
       chrome.storage.local.set({ audioPrimed: true });
-      console.log('Audio primed and ready');
+      console.log('Audio unlocked and ready');
+
+      // Remove the click prompt if it exists
+      const prompt = document.getElementById('upwork-scanner-prompt');
+      if (prompt) {
+        prompt.remove();
+      }
+
+      // Play any pending notifications
+      if (pendingAudioNotifications > 0) {
+        playNotificationSounds(pendingAudioNotifications);
+        pendingAudioNotifications = 0;
+      }
     }).catch(function(error) {
-      console.log('Audio priming failed:', error);
+      console.log('Audio unlock failed:', error);
     });
   });
+}
+
+// Fallback prime audio function (called when toggle is enabled)
+function primeAudio() {
+  unlockAudio();
 }
 
 // Listen for messages from popup
@@ -158,36 +207,143 @@ function scanJobs() {
 
 // Play notification sound for each new job
 function playNotificationSounds(count) {
-  // Ensure audio is primed
-  if (!audioPrimed) {
-    console.log('Audio not primed yet - click anywhere on the page to enable sounds');
-    showClickPrompt();
-    return;
-  }
+  console.log('Attempting to play notification sounds for', count, 'new job(s)');
 
-  // Resume audio context if suspended
+  // Show visual notification immediately regardless of audio state
+  showNewJobAlert(count);
+
+  // Try to resume audio context if suspended
   if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume();
+    audioContext.resume().then(function() {
+      audioUnlocked = true;
+      attemptPlayAudio(count);
+    }).catch(function(error) {
+      console.error('Failed to resume audio context:', error);
+      storePendingNotification(count);
+    });
+  } else if (audioContext && audioContext.state === 'running') {
+    audioUnlocked = true;
+    attemptPlayAudio(count);
+  } else {
+    // Audio context not initialized or not unlocked
+    storePendingNotification(count);
   }
+}
 
-  // Load custom audio or use default
+// Store pending notification and show prompt
+function storePendingNotification(count) {
+  pendingAudioNotifications += count;
+  console.log('Audio not ready - stored', count, 'pending notifications');
+  showClickPrompt();
+}
+
+// Attempt to play audio
+function attemptPlayAudio(count) {
   chrome.storage.local.get(['customAudio'], function(result) {
     const audioSrc = result.customAudio || chrome.runtime.getURL('alert-sound.wav');
 
     // Play sound for each new job with a slight delay between plays
+    let successfulPlays = 0;
     for (let i = 0; i < count; i++) {
       setTimeout(function() {
         const audio = new Audio(audioSrc);
         audio.volume = 1.0; // Full volume for actual notifications
 
-        audio.play().catch(function(error) {
+        audio.play().then(function() {
+          successfulPlays++;
+          console.log('Audio played successfully');
+        }).catch(function(error) {
           console.error('Error playing audio:', error);
-          console.log('Try clicking anywhere on the page to enable sounds');
-          showClickPrompt();
+          // Store as pending if first play fails
+          if (successfulPlays === 0 && i === 0) {
+            storePendingNotification(count - i);
+          }
         });
       }, i * 1000); // 1 second delay between each sound
     }
   });
+}
+
+// Show prominent visual alert for new jobs
+function showNewJobAlert(count) {
+  // Check if alert already exists
+  let alert = document.getElementById('upwork-scanner-job-alert');
+
+  if (!alert) {
+    alert = document.createElement('div');
+    alert.id = 'upwork-scanner-job-alert';
+
+    // Add styles
+    if (!document.getElementById('upwork-scanner-styles')) {
+      const style = document.createElement('style');
+      style.id = 'upwork-scanner-styles';
+      style.textContent = `
+        @keyframes pulseAlert {
+          0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(20, 168, 0, 0.4); }
+          50% { transform: scale(1.05); box-shadow: 0 4px 30px rgba(20, 168, 0, 0.6); }
+        }
+        @keyframes slideInAlert {
+          from { transform: translateY(-100px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+          to { opacity: 0; transform: translateY(-20px); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    alert.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #14a800 0%, #108a00 100%);
+      color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      z-index: 999999;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      animation: slideInAlert 0.5s ease-out, pulseAlert 2s ease-in-out infinite;
+      text-align: center;
+      min-width: 300px;
+      border: 3px solid #fff;
+    `;
+
+    document.body.appendChild(alert);
+
+    // Remove alert when clicked
+    alert.addEventListener('click', function() {
+      alert.style.animation = 'fadeOut 0.3s ease-out';
+      setTimeout(function() {
+        if (alert && alert.parentNode) {
+          alert.remove();
+        }
+      }, 300);
+    });
+  }
+
+  alert.innerHTML = `
+    <div style="font-size: 24px; margin-bottom: 8px;">🚨 NEW JOB${count > 1 ? 'S' : ''} ALERT! 🚨</div>
+    <div style="font-size: 16px; font-weight: 400;">${count} new job${count > 1 ? 's' : ''} detected!</div>
+    <div style="font-size: 12px; margin-top: 8px; opacity: 0.9;">Click to dismiss</div>
+  `;
+
+  // Auto-remove after 10 seconds
+  setTimeout(function() {
+    if (alert && alert.parentNode) {
+      alert.style.animation = 'fadeOut 0.3s ease-out';
+      setTimeout(function() {
+        if (alert && alert.parentNode) {
+          alert.remove();
+        }
+      }, 300);
+    }
+  }, 10000);
 }
 
 // Show prompt to click on page
@@ -199,54 +355,44 @@ function showClickPrompt() {
   prompt.id = 'upwork-scanner-prompt';
   prompt.style.cssText = `
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
-    background: #14a800;
+    background: #ff6b00;
     color: white;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
+    padding: 18px 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4);
+    z-index: 999998;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    animation: slideIn 0.3s ease-out;
+    animation: slideInAlert 0.5s ease-out, pulseAlert 2s ease-in-out infinite;
+    border: 2px solid white;
   `;
-  prompt.textContent = '🔔 Click anywhere to enable job notifications';
-
-  // Add animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
+  prompt.innerHTML = `
+    <div style="font-size: 18px; margin-bottom: 4px;">🔊 Enable Audio Alerts</div>
+    <div style="font-size: 12px; font-weight: 400; opacity: 0.95;">Click anywhere on the page</div>
   `;
-  document.head.appendChild(style);
 
   document.body.appendChild(prompt);
 
-  // Remove prompt when clicked or after 10 seconds
+  // Remove prompt when clicked
   const removePrompt = function() {
     if (prompt && prompt.parentNode) {
-      prompt.style.animation = 'slideIn 0.3s ease-out reverse';
+      prompt.style.animation = 'fadeOut 0.3s ease-out';
       setTimeout(function() {
         if (prompt && prompt.parentNode) {
-          prompt.parentNode.removeChild(prompt);
+          prompt.remove();
         }
       }, 300);
     }
   };
 
-  prompt.addEventListener('click', removePrompt);
-  setTimeout(removePrompt, 10000);
+  prompt.addEventListener('click', function() {
+    unlockAudio();
+    removePrompt();
+  });
 }
 
 // Extract job details from the current page
@@ -260,7 +406,9 @@ function extractJobDetails() {
     const titleElement = document.querySelector('h4[class*="job-title"]') ||
                         document.querySelector('[data-test="job-title"]') ||
                         document.querySelector('h2.h4') ||
-                        document.querySelector('.air3-card-section h4');
+                        document.querySelector('.air3-card-section h4') ||
+                        document.querySelector('a.air3-link[data-ev-label="link"]') ||
+                        document.querySelector('a[href*="/jobs/"]');
 
     if (titleElement) {
       jobTitle = titleElement.textContent.trim();
