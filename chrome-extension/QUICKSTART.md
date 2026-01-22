@@ -25,7 +25,8 @@
 1. Go to: `https://www.upwork.com/nx/find-work/`
 2. Click the extension icon
 3. Toggle "Auto-Refresh" to **ON**
-4. That's it! You'll hear a sound when new jobs appear
+4. **Important:** Click anywhere on the page when you see the green notification (required for Chrome to enable sounds)
+5. That's it! You'll hear a sound when new jobs appear
 
 ### Important Notes
 
