@@ -37,7 +37,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["alert-sound.wav", "offscreen.html"],
+      "resources": ["alert-sound.wav", "offscreen.html", "Proposal Prompt.txt"],
       "matches": ["https://www.upwork.com/*"]
     }
   ]

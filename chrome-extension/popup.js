@@ -6,8 +6,10 @@ const currentAudioName = document.getElementById('currentAudioName');
 const resetAudio = document.getElementById('resetAudio');
 const copyPromptBtn = document.getElementById('copyPrompt');
 const copyJobDetailsBtn = document.getElementById('copyJobDetails');
+const generateProposalBtn = document.getElementById('generateProposal');
 const promptFeedback = document.getElementById('promptFeedback');
 const jobFeedback = document.getElementById('jobFeedback');
+const generateFeedback = document.getElementById('generateFeedback');
 
 // Load saved state when popup opens
 chrome.storage.local.get(['enabled', 'customAudio', 'customAudioName'], function(result) {
@@ -155,4 +157,64 @@ copyJobDetailsBtn.addEventListener('click', function() {
       }, 2000);
     }
   });
+});
+
+// Handle generate proposal button
+generateProposalBtn.addEventListener('click', async function() {
+  try {
+    // First, fetch the prompt text
+    const response = await fetch(chrome.runtime.getURL('Proposal Prompt.txt'));
+    const promptText = await response.text();
+
+    // Then, get job details from the active tab
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      if (tabs[0] && tabs[0].url && tabs[0].url.includes('upwork.com')) {
+        // Send message to content script to get job details
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'getJobDetails' }, function(jobResponse) {
+          if (chrome.runtime.lastError) {
+            generateFeedback.textContent = '✗ Not on a job page';
+            setTimeout(() => {
+              generateFeedback.textContent = '';
+            }, 2000);
+            return;
+          }
+
+          if (jobResponse && jobResponse.success) {
+            // Replace [INSERT JOB DESCRIPTION HERE] with actual job details
+            const generatedProposal = promptText.replace('[INSERT JOB DESCRIPTION HERE]', jobResponse.jobDetails);
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(generatedProposal).then(() => {
+              generateFeedback.textContent = '✓ Proposal generated!';
+              setTimeout(() => {
+                generateFeedback.textContent = '';
+              }, 2000);
+            }).catch(error => {
+              generateFeedback.textContent = '✗ Failed to copy';
+              console.error('Error copying generated proposal:', error);
+              setTimeout(() => {
+                generateFeedback.textContent = '';
+              }, 2000);
+            });
+          } else {
+            generateFeedback.textContent = '✗ No job details found';
+            setTimeout(() => {
+              generateFeedback.textContent = '';
+            }, 2000);
+          }
+        });
+      } else {
+        generateFeedback.textContent = '✗ Not on Upwork';
+        setTimeout(() => {
+          generateFeedback.textContent = '';
+        }, 2000);
+      }
+    });
+  } catch (error) {
+    generateFeedback.textContent = '✗ Failed to generate';
+    console.error('Error generating proposal:', error);
+    setTimeout(() => {
+      generateFeedback.textContent = '';
+    }, 2000);
+  }
 });

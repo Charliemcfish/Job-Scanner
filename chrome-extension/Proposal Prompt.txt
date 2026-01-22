@@ -1,1 +1,229 @@
-You can add your custom proposal prompt here. This content will be copied to your clipboard when you click the "Copy Prompt" button in the extension.
+Im a web developer who uses upwork. I need you to put together an amazing proposal for my client based on the following job desciption and proposal template below:
+
+
+
+Paste the job description below:
+
+[INSERT JOB DESCRIPTION HERE]
+
+
+
+Instructions for AI
+
+Read the job description carefully and follow these steps:
+
+Step 1: Project Type Detection
+
+Analyze the job description to determine if this is:
+
+WEB PROJECT: Website, landing page, WordPress, e-commerce site, business site, web design/development
+
+APP PROJECT: Mobile app, React Native, Expo, iOS, Android, software development, cross-platform app, Firebase, Supabase
+
+Step 2: Extract Key Information
+
+Client name (use "there" if not provided)
+
+Project type and industry
+
+Budget (if mentioned)
+
+Timeline (if mentioned)
+
+Specific requirements and features needed
+
+Main goal (leads, sales, users, etc.)
+
+Step 3: Write the Proposal
+
+Use this structure, keeping it conversational and genuine:
+
+
+
+Proposal Template
+
+Opening (2-3 sentences max)
+
+Hi [NAME]! I read through your [PROJECT TYPE] project and it sounds like exactly the kind of work I love doing. I've built [RELEVANT NUMBER] similar [projects/apps/websites] over the past 10+ years, and I'm confident I can deliver what you're looking for [mention budget/timeline if stated].
+
+Why I'm a Good Fit (3-4 short bullets)
+
+Here's why I think we'd work well together:
+
+[RELEVANT EXPERIENCE]: Mention specific experience that matches their project
+
+[TECHNICAL SKILLS]: List the exact tech stack they need
+
+[RESULTS/TRACK RECORD]: Quick mention of successful projects or measurable outcomes
+
+[AVAILABILITY]: Communication style and responsiveness
+
+Portfolio Section
+
+I'd love to show you some relevant work:
+
+FOR WEB PROJECTS - Choose 2-3 most relevant:
+
+GT Cup - Motorsport company website with custom design and functionality https://gtcup.co.uk/
+
+Clayesmore School - Private school website with SEO optimization https://www.clayesmore.com/
+
+West of Center Apartments - Luxury real estate site with advanced property search https://westofcenterapartments.com/
+
+Charles Stoughton Apartments - Premium property showcase with booking system https://www.charlesstoughton.com/
+
+MyThirdPlace - Business directory and community platform built in React Native https://mythirdplace.net/
+
+Transform Sites - Digital agency website with SEO implementation https://transform-sites.netlify.app/
+
+FOR APP PROJECTS - Include all 3:
+
+Lovr - Dating app with date planner, interactive games, real-time chat, and matching system
+
+Neighbrs - Community services app with interactive map, job posting, user matching, and payment integration
+
+Borcelle Coffee - Coffee ordering app with drink customization, order tracking, and loyalty rewards program
+
+[Links coming soon - happy to share screenshots and details on a call]
+
+What I'll Deliver
+
+Based on what you've described, here's my approach:
+
+[CUSTOMIZE based on their specific needs - write 3-4 short, specific points addressing their requirements]
+
+FOR WEB PROJECTS, address things like:
+
+Professional design that matches their industry
+
+Mobile-responsive and fast-loading
+
+SEO optimization
+
+Easy content management
+
+Lead generation features
+
+Specific integrations they mentioned
+
+FOR APP PROJECTS, address things like:
+
+Cross-platform development (iOS + Android from one codebase)
+
+Backend setup (Firebase/Supabase)
+
+Specific features they mentioned (auth, payments, real-time, etc.)
+
+App store deployment
+
+Scalable architecture
+
+Push notifications if relevant
+
+Bonus Value (1-2 sentences)
+
+[FOR WEB]: After launch, I'll train you on managing the site yourself, and I offer discounted hosting with ongoing maintenance and security updates.
+
+[FOR APPS]: I stick around after launch to handle any issues, help with updates, and make sure your app store submissions go smoothly.
+
+Call to Action
+
+I'm excited about this project and would love to chat more about how we can make it successful. I'm available for a call this week to discuss your specific needs and answer any questions.
+
+Questions (2-3 relevant questions)
+
+A few things I'd like to discuss:
+
+[CUSTOMIZE based on job description - ask about their most important requirements, timeline, existing assets, technical preferences, or anything unclear from their post]
+
+Looking forward to working together!
+
+Charlie
+
+
+
+Writing Guidelines
+
+Tone:
+
+Conversational and genuine, like you're talking to a friend
+
+Confident but humble
+
+Enthusiastic without being over-the-top
+
+No buzzwords or corporate jargon
+
+No emojis
+
+Structure:
+
+Short paragraphs (2-3 sentences max)
+
+Plenty of white space
+
+Bullet points only where they add clarity
+
+NO walls of text
+
+Language:
+
+Use "I've built" not "I have built"
+
+Use contractions (I'm, you're, it's)
+
+Active voice, not passive
+
+Simple words over complex ones
+
+Specific numbers and examples over vague claims
+
+What to AVOID:
+
+Generic statements that could apply to anyone
+
+Overpromising or exaggerating
+
+Repeating information unnecessarily
+
+Corporate speak ("leverage," "synergize," "solutions")
+
+Making it sound templated or AI-written
+
+Long sentences or complex vocabulary
+
+What to INCLUDE:
+
+Direct responses to their specific needs
+
+Relevant portfolio pieces only
+
+Realistic timelines and expectations
+
+Clear value proposition
+
+Genuine enthusiasm for their project
+
+
+
+Customization Checklist
+
+Before generating, verify:
+
+[ ] Correctly identified as web or app project
+
+[ ] Extracted client name and project details
+
+[ ] Selected relevant portfolio pieces (2-3 for web, all 3 for apps)
+
+[ ] Addressed their specific requirements
+
+[ ] Asked relevant questions about their project
+
+[ ] Kept total length under 400 words
+
+[ ] Removed all bracketed placeholders
+
+[ ] Made it feel personal and genuine
+
+[ ] Included full URLs for web portfolio (not hyperlinked)
