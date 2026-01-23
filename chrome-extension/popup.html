@@ -88,65 +88,6 @@
       color: #14a800;
     }
 
-    .audio-upload {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .audio-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: #333;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .file-input-wrapper {
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
-    }
-
-    .file-input-wrapper input[type=file] {
-      position: absolute;
-      left: -9999px;
-    }
-
-    .file-input-label {
-      display: inline-block;
-      padding: 8px 16px;
-      background-color: #f7f7f7;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 13px;
-      color: #333;
-      transition: background-color 0.2s;
-    }
-
-    .file-input-label:hover {
-      background-color: #e8e8e8;
-    }
-
-    .current-audio {
-      font-size: 12px;
-      color: #666;
-      margin-top: 8px;
-    }
-
-    .reset-audio {
-      font-size: 12px;
-      color: #0066cc;
-      cursor: pointer;
-      margin-left: 10px;
-      text-decoration: underline;
-    }
-
-    .reset-audio:hover {
-      color: #004999;
-    }
-
     .proposal-section {
       margin-top: 15px;
       padding-top: 15px;
@@ -241,18 +182,6 @@
       </label>
     </div>
     <div class="status" id="status">Disabled</div>
-  </div>
-
-  <div class="audio-upload">
-    <label class="audio-label">Notification Sound</label>
-    <div class="file-input-wrapper">
-      <input type="file" id="audioUpload" accept="audio/*">
-      <label for="audioUpload" class="file-input-label">Choose Audio File</label>
-    </div>
-    <div class="current-audio">
-      <span id="currentAudioName">Default (alert-sound.wav)</span>
-      <span class="reset-audio" id="resetAudio" style="display: none;">Reset to Default</span>
-    </div>
   </div>
 
   <div class="proposal-section">

@@ -6,7 +6,6 @@
   "permissions": [
     "storage",
     "activeTab",
-    "offscreen",
     "tts"
   ],
   "host_permissions": [
@@ -37,7 +36,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["alert-sound.wav", "offscreen.html", "Proposal Prompt.txt"],
+      "resources": ["Proposal Prompt.txt"],
       "matches": ["https://www.upwork.com/*"]
     }
   ]
