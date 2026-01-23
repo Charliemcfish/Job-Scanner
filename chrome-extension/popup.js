@@ -1,9 +1,6 @@
 // Get DOM elements
 const enableToggle = document.getElementById('enableToggle');
 const statusText = document.getElementById('status');
-const audioUpload = document.getElementById('audioUpload');
-const currentAudioName = document.getElementById('currentAudioName');
-const resetAudio = document.getElementById('resetAudio');
 const copyPromptBtn = document.getElementById('copyPrompt');
 const copyJobDetailsBtn = document.getElementById('copyJobDetails');
 const generateProposalBtn = document.getElementById('generateProposal');
@@ -12,14 +9,9 @@ const jobFeedback = document.getElementById('jobFeedback');
 const generateFeedback = document.getElementById('generateFeedback');
 
 // Load saved state when popup opens
-chrome.storage.local.get(['enabled', 'customAudio', 'customAudioName'], function(result) {
+chrome.storage.local.get(['enabled'], function(result) {
   enableToggle.checked = result.enabled || false;
   updateStatus(result.enabled || false);
-
-  if (result.customAudio) {
-    currentAudioName.textContent = result.customAudioName || 'Custom Audio';
-    resetAudio.style.display = 'inline';
-  }
 });
 
 // Handle toggle switch
@@ -38,44 +30,6 @@ enableToggle.addEventListener('change', function() {
         });
       }
     });
-  });
-});
-
-// Handle audio file upload
-audioUpload.addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  // Validate file is audio
-  if (!file.type.startsWith('audio/')) {
-    alert('Please select a valid audio file');
-    return;
-  }
-
-  // Read file as data URL
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const audioData = e.target.result;
-
-    // Save to storage
-    chrome.storage.local.set({
-      customAudio: audioData,
-      customAudioName: file.name
-    }, function() {
-      currentAudioName.textContent = file.name;
-      resetAudio.style.display = 'inline';
-    });
-  };
-
-  reader.readAsDataURL(file);
-});
-
-// Handle reset to default audio
-resetAudio.addEventListener('click', function() {
-  chrome.storage.local.remove(['customAudio', 'customAudioName'], function() {
-    currentAudioName.textContent = 'Default (alert-sound.wav)';
-    resetAudio.style.display = 'none';
-    audioUpload.value = '';
   });
 });
 

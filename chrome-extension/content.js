@@ -2,9 +2,6 @@
 let isEnabled = false;
 let refreshTimer = null;
 let previousJobIds = new Set();
-let audioContext = null;
-let audioPrimed = false;
-let audioUnlocked = false;
 let initialLoadComplete = false;
 
 // Initialize on page load
@@ -12,40 +9,13 @@ init();
 
 function init() {
   // Load initial state from storage
-  chrome.storage.local.get(['enabled', 'previousJobs', 'audioPrimed'], function(result) {
+  chrome.storage.local.get(['enabled', 'previousJobs'], function(result) {
     isEnabled = result.enabled || false;
     previousJobIds = new Set(result.previousJobs || []);
-    audioPrimed = result.audioPrimed || false;
 
     if (isEnabled) {
       startScanning();
     }
-
-    // Aggressively prime audio on every page load
-    initializeAudio();
-
-    // Add multiple event listeners to catch user interaction
-    // Using more events and not using 'once' so we keep trying
-    const interactionEvents = ['click', 'mousedown', 'keydown', 'touchstart', 'scroll', 'mousemove', 'wheel', 'pointerdown'];
-    interactionEvents.forEach(function(eventType) {
-      document.addEventListener(eventType, unlockAudio, { passive: true, capture: true });
-    });
-
-    // Also try to unlock audio immediately on visibility change
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) {
-        initializeAudio();
-      }
-    });
-
-    // Set up a recurring timer to keep trying to resume audio context
-    setInterval(function() {
-      if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume().catch(function() {
-          // Silent fail, will keep trying
-        });
-      }
-    }, 5000); // Try every 5 seconds
 
     // IMPORTANT: Only scan jobs AFTER we've loaded previousJobIds from storage
     // This prevents false positives on page load
@@ -54,81 +24,12 @@ function init() {
   });
 }
 
-// Initialize audio context and attempt to resume it
-function initializeAudio() {
-  // Create audio context if it doesn't exist
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  }
-
-  // Try to resume audio context immediately (works if user previously interacted)
-  if (audioContext.state === 'suspended') {
-    audioContext.resume().then(function() {
-      console.log('Audio context resumed successfully');
-      audioUnlocked = true;
-    }).catch(function(error) {
-      console.log('Audio context resume failed:', error);
-    });
-  } else if (audioContext.state === 'running') {
-    audioUnlocked = true;
-    console.log('Audio context already running');
-  }
-}
-
-// Unlock audio with user interaction
-function unlockAudio() {
-  // Don't return early - always try to resume if suspended
-  if (audioUnlocked && audioContext && audioContext.state === 'running') {
-    return; // Already unlocked and running
-  }
-
-  console.log('User interaction detected - unlocking audio');
-
-  // Create audio context if needed
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  }
-
-  // Resume audio context
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
-
-  // Create and play a silent audio to unlock the audio system
-  chrome.storage.local.get(['customAudio'], function(result) {
-    const audioSrc = result.customAudio || chrome.runtime.getURL('alert-sound.wav');
-    const audio = new Audio(audioSrc);
-    audio.volume = 0.01; // Almost silent
-    audio.play().then(function() {
-      audioUnlocked = true;
-      audioPrimed = true;
-      chrome.storage.local.set({ audioPrimed: true });
-      console.log('Audio unlocked and ready');
-
-      // Remove the click prompt if it exists
-      const prompt = document.getElementById('upwork-scanner-prompt');
-      if (prompt) {
-        prompt.remove();
-      }
-    }).catch(function(error) {
-      console.log('Audio unlock failed:', error);
-    });
-  });
-}
-
-// Fallback prime audio function (called when toggle is enabled)
-function primeAudio() {
-  unlockAudio();
-}
-
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === 'toggleRefresh') {
     isEnabled = request.enabled;
 
     if (isEnabled) {
-      // Prime audio when user enables (this is a user gesture)
-      primeAudio();
       startScanning();
     } else {
       stopScanning();
@@ -195,6 +96,9 @@ function scanJobs() {
     }
   });
 
+  // Store whether we had previous jobs (to prevent false positives on first scan)
+  const hadPreviousJobs = previousJobIds.size > 0;
+
   // Find new jobs (jobs in current set but not in previous set)
   const newJobs = [];
   currentJobIds.forEach(function(jobId) {
@@ -203,10 +107,14 @@ function scanJobs() {
     }
   });
 
-  // If there are new jobs, play sound for each one
-  if (newJobs.length > 0) {
+  // Only trigger notification if:
+  // 1. There are new jobs AND
+  // 2. We had previous jobs (not the first scan/page load)
+  if (newJobs.length > 0 && hadPreviousJobs) {
     console.log('New jobs found:', newJobs.length);
     playNotificationSounds(newJobs.length);
+  } else if (newJobs.length > 0 && !hadPreviousJobs) {
+    console.log('Initial scan - found', currentJobIds.size, 'jobs (no notification)');
   }
 
   // Update stored job IDs
@@ -321,55 +229,6 @@ function showNewJobAlert(count) {
       }, 300);
     }
   }, 10000);
-}
-
-// Show prompt to click on page
-function showClickPrompt() {
-  // Check if prompt already exists
-  if (document.getElementById('upwork-scanner-prompt')) return;
-
-  const prompt = document.createElement('div');
-  prompt.id = 'upwork-scanner-prompt';
-  prompt.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #ff6b00;
-    color: white;
-    padding: 18px 24px;
-    border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4);
-    z-index: 999998;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    animation: slideInAlert 0.5s ease-out, pulseAlert 2s ease-in-out infinite;
-    border: 2px solid white;
-  `;
-  prompt.innerHTML = `
-    <div style="font-size: 18px; margin-bottom: 4px;">🔊 Enable Audio Alerts</div>
-    <div style="font-size: 12px; font-weight: 400; opacity: 0.95;">Click anywhere on the page</div>
-  `;
-
-  document.body.appendChild(prompt);
-
-  // Remove prompt when clicked
-  const removePrompt = function() {
-    if (prompt && prompt.parentNode) {
-      prompt.style.animation = 'fadeOut 0.3s ease-out';
-      setTimeout(function() {
-        if (prompt && prompt.parentNode) {
-          prompt.remove();
-        }
-      }, 300);
-    }
-  };
-
-  prompt.addEventListener('click', function() {
-    unlockAudio();
-    removePrompt();
-  });
 }
 
 // Extract job details from the current page
