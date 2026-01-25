@@ -1,14 +1,14 @@
-Im a web developer who uses upwork. I need you to put together an amazing proposal for my client based on the following job desciption and proposal template below:
+Im a web developer who uses Upwork. I need you to put together an amazing proposal for my client based on the following job desciption and proposal template below:
 
 
 
-Paste the job description below:
+Here's the job description:
 
 [INSERT JOB DESCRIPTION HERE]
 
 
 
-Instructions for AI
+Instructions for you
 
 Read the job description carefully and follow these steps:
 
@@ -44,9 +44,9 @@ Proposal Template
 
 Opening (2-3 sentences max)
 
-Hi [NAME]! I read through your [PROJECT TYPE] project and it sounds like exactly the kind of work I love doing. I've built [RELEVANT NUMBER] similar [projects/apps/websites] over the past 10+ years, and I'm confident I can deliver what you're looking for [mention budget/timeline if stated].
+Hi [NAME]! I read through your [PROJECT TYPE] project and it sounds like exactly the kind of work I love doing. I've built [many/lots of/countless] similar [projects/apps/websites] over the past 10 years, and I'm confident I can deliver what you're looking for [mention budget/timeline if stated].
 
-Why I'm a Good Fit (3-4 short bullets)
+Why I'm a Good Fit (2-3 sentences)
 
 Here's why I think we'd work well together:
 
@@ -62,27 +62,59 @@ Portfolio Section
 
 I'd love to show you some relevant work:
 
-FOR WEB PROJECTS - Choose 2-3 most relevant:
+FOR WEB PROJECTS - Choose 2-3 most relevant to the project:
 
 GT Cup - Motorsport company website with custom design and functionality https://gtcup.co.uk/
 
-Clayesmore School - Private school website with SEO optimization https://www.clayesmore.com/
+Clayesmore School - Private school website with SEO optimization (Mention if school related job). https://www.clayesmore.com/ (For school/education jobs)
 
-West of Center Apartments - Luxury real estate site with advanced property search https://westofcenterapartments.com/
+West of Center Apartments - Luxury real estate site with advanced property search https://westofcenterapartments.com/ (Mention if real estate/property job)
 
-Charles Stoughton Apartments - Premium property showcase with booking system https://www.charlesstoughton.com/
+Charles Stoughton Apartments - Premium property showcase with booking system https://www.charlesstoughton.com/ (Mention if real estate/property job)
 
-MyThirdPlace - Business directory and community platform built in React Native https://mythirdplace.net/
+MyThirdPlace - Business directory and community platform built in React Native https://mythirdplace.net/ (Mention for App dev as this was made using react native, directories, social media, blogging platform).
 
-Transform Sites - Digital agency website with SEO implementation https://transform-sites.netlify.app/
+Transform Sites - Digital agency website with SEO implementation https://transformsites.co.uk/ (Mention for agency jobs)
+
+BinKind – Service website for a bin cleaner with an impressive booking system, that allows users to select their bins, date for a bin clean, and calendar integration.
+
+https://binkind.co.uk/ (Mention if booking/calendar integration etc. Is needed for job).
+
+Monumental Global – Private leadership network for men with impressive design elements (For mention of coaching, leadership job).
+https://monumental.global/
+
+YellowBox Print On Demand Clothing – Print On Demand Website design for a local company (USE THIS FOR MENTION OF SHOPIFY, SHOP, OR PRINT ON DEMAND).
+https://yellowboxsolutions.yourwebshop.com/
+
+Dyers Plumbing And Heating – Services website to showcase the plumbing and heating services Dyers offer. Custom quote generator to quickly offer a quote for plumbing/heating services to customers based on their budget. (Show this to tradesmen/service jobs).
+https://dyersplumbingheating.com/
+
+Chesapeake Systems – Website for an IT Solutions company
+https://chesapeake.biz/ (Mention if job is for an IT website).
+
+Sisu Synergy Marketing – Website design for marketing agency
+
+https://www.sisusynergy.com/ (Mention this website for marketing related website jobs).
+
+
+
+
+
+
 
 FOR APP PROJECTS - Include all 3:
 
 Lovr - Dating app with date planner, interactive games, real-time chat, and matching system
 
 Neighbrs - Community services app with interactive map, job posting, user matching, and payment integration
+https://www.upwork.com/freelancers/~01a837451e7ebb1c18?p=2010447063899967488
+
+
 
 Borcelle Coffee - Coffee ordering app with drink customization, order tracking, and loyalty rewards program
+https://www.upwork.com/freelancers/~01a837451e7ebb1c18?p=2010440480369070080
+
+
 
 [Links coming soon - happy to share screenshots and details on a call]
 
@@ -90,7 +122,7 @@ What I'll Deliver
 
 Based on what you've described, here's my approach:
 
-[CUSTOMIZE based on their specific needs - write 3-4 short, specific points addressing their requirements]
+[CUSTOMIZE based on their specific needs - write 3-4 short, specific points addressing their requirements. This section is crucial, as it indicates to the client I am the freelancer they should pick.]
 
 FOR WEB PROJECTS, address things like:
 
@@ -146,7 +178,7 @@ Writing Guidelines
 
 Tone:
 
-Conversational and genuine, like you're talking to a friend
+Conversational and genuine, like you're talking to a friend (VERY IMPORTANT).
 
 Confident but humble
 
