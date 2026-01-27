@@ -4,10 +4,21 @@ let refreshTimer = null;
 let previousJobIds = new Set();
 let initialLoadComplete = false;
 
+// Check if we're on the find-work page (the only page that should auto-refresh)
+const FIND_WORK_URL = 'https://www.upwork.com/nx/find-work';
+function isOnFindWorkPage() {
+  return window.location.href.startsWith(FIND_WORK_URL);
+}
+
 // Initialize on page load
 init();
 
 function init() {
+  // Only run refresh/scanning logic on the find-work page
+  if (!isOnFindWorkPage()) {
+    return;
+  }
+
   // Load initial state from storage
   chrome.storage.local.get(['enabled', 'previousJobs'], function(result) {
     isEnabled = result.enabled || false;
@@ -27,6 +38,11 @@ function init() {
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === 'toggleRefresh') {
+    // Only handle refresh toggle on find-work page
+    if (!isOnFindWorkPage()) {
+      return;
+    }
+
     isEnabled = request.enabled;
 
     if (isEnabled) {
