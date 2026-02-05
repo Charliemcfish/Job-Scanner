@@ -86,6 +86,12 @@ https://monumental.global/
 YellowBox Print On Demand Clothing – Print On Demand Website design for a local company (USE THIS FOR MENTION OF SHOPIFY, SHOP, OR PRINT ON DEMAND).
 https://yellowboxsolutions.yourwebshop.com/
 
+Mind Your Business Streetwear - A beautiful and eye catching ecommerce store to showcase the Mind Your Business range, built in Shopify. (Mention this project for ecommerce/shopify projects)
+https://mind-your-business-clothing.transformsites.co.uk/
+
+Maison Verrier Watches - A luxury watch reselling ecommerce store. Maison Verrier provides customers with a unique and beautiful user journey and shopping experience, to find their next watch. (Mention this project for ecommerce/shopify projects)
+https://maison-verrier.transformsites.co.uk/
+
 Dyers Plumbing And Heating – Services website to showcase the plumbing and heating services Dyers offer. Custom quote generator to quickly offer a quote for plumbing/heating services to customers based on their budget. (Show this to tradesmen/service jobs).
 https://dyersplumbingheating.com/
 
@@ -102,14 +108,16 @@ https://www.sisusynergy.com/ (Mention this website for marketing related website
 
 
 
-FOR APP PROJECTS - Include all 3:
+FOR APP PROJECTS - Include all:
 
-Lovr - Dating app with date planner, interactive games, real-time chat, and matching system
+Lovr Dating App - An impressive dating app with unique and fun functionality like customisable and fun chat system, date planner, map functionality, and more!
+https://lovr-dating.netlify.app/
 
-Neighbrs - Community services app with interactive map, job posting, user matching, and payment integration
-https://www.upwork.com/freelancers/~01a837451e7ebb1c18?p=2010447063899967488
+Neigbhrs App - A community focused app that allows neighbours to get help from eachother, and support tradesmen and community related jobs with a bidding system, interactive map, and chat functionality.
+https://neigbhrs.netlify.app/
 
-
+BookIt App - A holiday booking app with an AI holiday package booker to help you plan the perfect holiday, impressive design and good user flow.
+https://bookit-demo.netlify.app/
 
 Borcelle Coffee - Coffee ordering app with drink customization, order tracking, and loyalty rewards program
 https://www.upwork.com/freelancers/~01a837451e7ebb1c18?p=2010440480369070080
