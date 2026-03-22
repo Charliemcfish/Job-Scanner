@@ -105,7 +105,7 @@ Lovr Dating App - An impressive dating app with unique and fun functionality lik
 https://lovr-dating.netlify.app/
 
 Neigbhrs App - A community focused app that allows neighbours to get help from eachother, and support tradesmen and community related jobs. Built in react native, boasting  a bidding system, interactive map to find jobs, messaging functionality to discuss jobs, an escrow functionality for holding funds, integrated with Stripe. Check out the demo below!
-https://neigbhrs.netlify.app/
+https://neighbrs.netlify.app/
 
 BookIt App - A holiday booking app to help you plan the perfect holiday, with a focus on impressive design and good user flow. Built in React Native with Firebase, featuring an AI holiday finder that uses AI to plan a trip based on your requirements. Check out the demo below!
 https://bookit-demo.netlify.app/
