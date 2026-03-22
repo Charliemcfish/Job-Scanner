@@ -1,12 +1,8 @@
 Im a web developer who uses Upwork. I need you to put together an amazing proposal for my client based on the following job desciption and proposal template below:
 
-
-
 Here's the job description:
 
 [INSERT JOB DESCRIPTION HERE]
-
-
 
 Instructions for you
 
@@ -38,8 +34,6 @@ Step 3: Write the Proposal
 
 Use this structure, keeping it conversational and genuine:
 
-
-
 Proposal Template
 
 Opening (2-3 sentences max)
@@ -64,65 +58,60 @@ I'd love to show you some relevant work:
 
 FOR WEB PROJECTS - Choose 2-3 most relevant to the project:
 
-GT Cup - Motorsport company website with custom design and functionality https://gtcup.co.uk/
+Clayesmore School - Website development + branding for a prestigious UK Private school, with search engine optimisation completed also with great results, ranking them at the top of Google alongside their competitors.   https://www.clayesmore.com/ (Mention for educational/school jobs only)
 
-Clayesmore School - Private school website with SEO optimization (Mention if school related job). https://www.clayesmore.com/ (For school/education jobs)
+West of Center Apartments - Luxury real estate branding and website developed in Wordpress, for Corvo Properties, a leading real estate business in Boston. Website features virtual apartment tours, an interactive map to see whats in the local area, 3d renders of apartment floor plans, and live chat support. SEO was also completed to increase website traffic and enquiries.  https://westofcenterapartments.com/ (Mention this job for real estate/business jobs, Wordpress jobs, SEO jobs.)
 
-West of Center Apartments - Luxury real estate site with advanced property search https://westofcenterapartments.com/ (Mention if real estate/property job)
+Charles Stoughton Apartments - Premium branding and a bespoke WordPress website developed for Corvo Properties, one of Boston's leading real estate companies. The platform features immersive virtual tours, interactive local area mapping, detailed 3D apartment layouts, and live chat functionality, alongside strategic SEO to boost visibility and generate enquiries.
+https://www.charlesstoughton.com/ (Mention if real estate/property/business job, Wordpress job, SEO required jobs)
 
-Charles Stoughton Apartments - Premium property showcase with booking system https://www.charlesstoughton.com/ (Mention if real estate/property job)
+MyThirdPlace - Platform development for MyThirdPlace, that allows users to discover, discuss, and join a community for Third Places. The platform was built in React Native and Firebase (Only mention that for App Dev jobs), featuring an interactive map of all third places, blog system, posting your own venues, and many other social networking features. Soon to launch on App Stores!
+https://mythirdplace.net/ (Mention for App dev as this was made using react native, directories, social media, blogging platform, mention for business websites, react native jobs, and blog building jobs).
 
-MyThirdPlace - Business directory and community platform built in React Native https://mythirdplace.net/ (Mention for App dev as this was made using react native, directories, social media, blogging platform).
+Transform Sites - Website development for a reputable digital agency in the UK in Wordpress. Beautiful website design  with SEO implementation to boost website traffic with great results.  https://transformsites.co.uk/ (Mention for agency website jobs, b2b jobs, wordpress jobs, elementor jobs, wix jobs.)
 
-Transform Sites - Digital agency website with SEO implementation https://transformsites.co.uk/ (Mention for agency jobs)
+BinKind – Service platform developed in React Native for a prominent bin cleaning business in the UK, with an impressive booking system, that allows users to select their bins, date for a bin clean, and calendar integration. Also features GoCardless + Stripe Integration).
+https://binkind.co.uk/ (Mention if booking/calendar integration etc. Is needed for job, b2b jobs, business jobs).
 
-BinKind – Service website for a bin cleaner with an impressive booking system, that allows users to select their bins, date for a bin clean, and calendar integration.
-
-https://binkind.co.uk/ (Mention if booking/calendar integration etc. Is needed for job).
-
-Monumental Global – Private leadership network for men with impressive design elements (For mention of coaching, leadership job).
+Monumental Global – Website development for a reputable Private leadership group, Monumental Global. Stunning website design in Wordpress + Elementor, with podcast integration.  (Mention for business jobs, elementor jobs, websites that require podcasts, wordpress jobs, charity jobs).
 https://monumental.global/
 
 YellowBox Print On Demand Clothing – Print On Demand Website design for a local company (USE THIS FOR MENTION OF SHOPIFY, SHOP, OR PRINT ON DEMAND).
 https://yellowboxsolutions.yourwebshop.com/
 
-Mind Your Business Streetwear - A beautiful and eye catching ecommerce store to showcase the Mind Your Business range, built in Shopify. (Mention this project for ecommerce/shopify projects)
+Mind Your Business Streetwear - A beautiful and eye catching ecommerce store to showcase the Mind Your Business range, built in Shopify. Completed graphic design/product mockups, and website design for client.  (Mention this project for ecommerce/shopify projects) Website launching soon!
 https://mind-your-business-clothing.transformsites.co.uk/
 
-Maison Verrier Watches - A luxury watch reselling ecommerce store. Maison Verrier provides customers with a unique and beautiful user journey and shopping experience, to find their next watch. (Mention this project for ecommerce/shopify projects)
+Maison Verrier Watches - A luxury watch reselling ecommerce store. Maison Verrier provides customers with a unique and beautiful user journey and shopping experience, to find their next watch. (Mention this project for ecommerce/shopify projects) Website launching soon!
 https://maison-verrier.transformsites.co.uk/
 
-Dyers Plumbing And Heating – Services website to showcase the plumbing and heating services Dyers offer. Custom quote generator to quickly offer a quote for plumbing/heating services to customers based on their budget. (Show this to tradesmen/service jobs).
+Dyers Plumbing And Heating – Wordpress website to showcase the plumbing and heating services Dyers offer. Custom quote generator to quickly offer a quote for plumbing/heating services to customers based on their budget. (Show this to tradesmen/service jobs, wordpress jobs).
 https://dyersplumbingheating.com/
 
-Chesapeake Systems – Website for an IT Solutions company
-https://chesapeake.biz/ (Mention if job is for an IT website).
+Chesapeake Systems –Wix Website development for an IT solutions business in the US.
+https://chesapeake.biz/ (Mention if job is for an IT website, b2b, Wix website).
 
-Sisu Synergy Marketing – Website design for marketing agency
+Sisu Synergy Marketing – Completed a Website redesign for Sisu Synergy to showcase their marketing services in a beautiful way. Website built in Wix.
+https://www.sisusynergy.com/ (Mention this website for marketing related website jobs, Wix jobs).
 
-https://www.sisusynergy.com/ (Mention this website for marketing related website jobs).
+Mountain Top Concrete - Wordpress website redesigned for a well-established Concreting company in the US. Featuring a beautiful design that's conversion focused, flipping book integration, and locational based SEO pages to boost website traffic. https://mtconcreteinc.com/ (Mention this job for tradesmen/building/business websites, Wordpress websites, and SEO jobs)
 
-
-
-
-
+Lets Go Hub - The Let's Go Hub website is a WordPress-built platform that presents Ilana's services alongside a content-driven blog and an integrated members lounge offering exclusive resources and community features. Built using Elementor and WooCommerce, it combines service promotion, gated content, and community engagement into a single user-focused experience. https://letsgohub.co.uk/ (Mention for small business website jobs, blog jobs, wordpress jobs, elementor jobs, jobs that require membership systems).
 
 
 FOR APP PROJECTS - Include all:
 
-Lovr Dating App - An impressive dating app with unique and fun functionality like customisable and fun chat system, date planner, map functionality, and more!
+Lovr Dating App - An impressive dating app with unique and fun functionality like customisable and fun chat system, date planner, map functionality, and more! Built in React, click below for a demo!
 https://lovr-dating.netlify.app/
 
-Neigbhrs App - A community focused app that allows neighbours to get help from eachother, and support tradesmen and community related jobs with a bidding system, interactive map, and chat functionality.
+Neigbhrs App - A community focused app that allows neighbours to get help from eachother, and support tradesmen and community related jobs. Built in react native, boasting  a bidding system, interactive map to find jobs, messaging functionality to discuss jobs, an escrow functionality for holding funds, integrated with Stripe. Check out the demo below!
 https://neigbhrs.netlify.app/
 
-BookIt App - A holiday booking app with an AI holiday package booker to help you plan the perfect holiday, impressive design and good user flow.
+BookIt App - A holiday booking app to help you plan the perfect holiday, with a focus on impressive design and good user flow. Built in React Native with Firebase, featuring an AI holiday finder that uses AI to plan a trip based on your requirements. Check out the demo below!
 https://bookit-demo.netlify.app/
 
-Borcelle Coffee - Coffee ordering app with drink customization, order tracking, and loyalty rewards program
+Borcelle Coffee - Coffee ordering app with a unique drink customization feature that allows you to select the coffee type/ingredients/milk type for your drink, order tracking, and loyalty rewards program and user profile customisation. Launching across the UK soon! Check out below!
 https://www.upwork.com/freelancers/~01a837451e7ebb1c18?p=2010440480369070080
-
-
 
 [Links coming soon - happy to share screenshots and details on a call]
 
@@ -179,8 +168,6 @@ A few things I'd like to discuss:
 Looking forward to working together!
 
 Charlie
-
-
 
 Writing Guidelines
 
@@ -243,8 +230,6 @@ Realistic timelines and expectations
 Clear value proposition
 
 Genuine enthusiasm for their project
-
-
 
 Customization Checklist
 
